@@ -1,47 +1,52 @@
 import { NextResponse } from 'next/server'
-import { connectDB } from '@/app/api/login/lib/db'
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json()
+import db from '@/lib/db'
 
-    const login = body.login?.trim()
-    const password = body.password?.trim()
+export async function POST(
+  req: Request
+){
 
-    console.log('LOGIN:', login)
-    console.log('PASSWORD:', password)
+  try{
 
-    const db = await connectDB()
+    const {
+      email,
+      password
+    } = await req.json()
 
-    console.log('DB CONNECTED')
+    const [rows]: any =
+      await db.execute(
 
-    const [rows]: any = await db.execute(
-      'SELECT * FROM users WHERE login = ? AND password = ?',
-      [login, password]
-    )
+        `
+        SELECT * FROM users
+        WHERE email = ?
+        AND password = ?
+        `,
 
-    console.log('ROWS:', rows)
-
-    if (!rows || rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Невірний логін або пароль' },
-        { status: 401 }
+        [email,password]
       )
+
+    if(rows.length === 0){
+
+      return NextResponse.json({
+
+        success:false
+      })
     }
 
-    const user = rows[0]
-
     return NextResponse.json({
-      login: user.login,
-      role: user.role
+
+      success:true,
+
+      user: rows[0]
     })
 
-  } catch (error) {
-    console.error('SERVER ERROR:', error)
+  } catch(error){
 
-    return NextResponse.json(
-      { error: 'Помилка сервера' },
-      { status: 500 }
-    )
+    console.log(error)
+
+    return NextResponse.json({
+
+      success:false
+    })
   }
 }

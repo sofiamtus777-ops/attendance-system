@@ -1,110 +1,113 @@
 'use client'
-import {useState} from 'react'
 
-export default function StudentTable({
-students,
-setStudents,
-user
-}){
+import { useEffect, useState } from 'react'
 
-const [search,setSearch]=useState('')
+export default function StudentsTable() {
 
-function removeStudent(id){
-setStudents(
-students.filter(
-s=>s.id!==id
-)
-)
+  const [students, setStudents] = useState<any[]>([])
+
+  useEffect(() => {
+    loadStudents()
+  }, [])
+
+  async function loadStudents() {
+
+    try {
+
+      const res = await fetch('/api/students')
+
+      const data = await res.json()
+
+      if (Array.isArray(data)) {
+        setStudents(data)
+      } else {
+        setStudents([])
+      }
+
+    } catch (error) {
+
+      console.log(error)
+
+      setStudents([])
+    }
+  }
+
+  return (
+
+    <div
+      style={{
+        background: 'white',
+        borderRadius: 20,
+        padding: 20,
+        marginTop: 30
+      }}
+    >
+
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse'
+        }}
+      >
+
+        <thead>
+
+          <tr
+            style={{
+              background: '#dbeafe'
+            }}
+          >
+
+            <th style={thStyle}>Студент</th>
+            <th style={thStyle}>Група</th>
+            <th style={thStyle}>Пропуски</th>
+            <th style={thStyle}>Статус</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          {students.map((student) => (
+
+            <tr key={student.id}>
+
+              <td style={tdStyle}>
+                {student.name}
+              </td>
+
+              <td style={tdStyle}>
+                {student.group_name}
+              </td>
+
+              <td style={tdStyle}>
+                {student.misses || 0}
+              </td>
+
+              <td style={tdStyle}>
+                {student.status || 'Навчається'}
+              </td>
+
+            </tr>
+
+          ))}
+
+        </tbody>
+
+      </table>
+
+    </div>
+  )
 }
 
-function editStudent(id){
-
-const newName=prompt('Нове ПІБ')
-
-if(!newName) return
-
-setStudents(
-students.map(s=>
-s.id===id
-? {...s,name:newName}
-: s
-)
-)
-
+const thStyle = {
+  padding: 15,
+  textAlign: 'left' as const,
+  borderBottom: '1px solid #ccc'
 }
 
-return(
-
-<div className='bg-white p-8 rounded-3xl'>
-
-<input
-placeholder='Пошук'
-onChange={e=>setSearch(e.target.value)}
-className='border p-3 mb-4 rounded-xl'
-/>
-
-<div className='flex gap-3 mb-4'>
-<button className='bg-blue-600 text-white px-4 py-2 rounded-xl'>
-Експорт Excel
-</button>
-
-<button className='bg-purple-600 text-white px-4 py-2 rounded-xl'>
-PDF звіт
-</button>
-</div>
-
-<table className='w-full'>
-
-<tbody>
-
-{students
-.filter(s=>
-s.name.toLowerCase().includes(
-search.toLowerCase()
-)
-)
-.map(s=>(
-
-<tr key={s.id}>
-<td>{s.name}</td>
-<td>{s.group}</td>
-<td>{s.absences}</td>
-
-<td>
-
-{user.role!=='Староста' &&(
-
-<>
-
-<button
-onClick={()=>editStudent(s.id)}
-className='bg-yellow-400 px-3 py-2 rounded-xl mr-2'
->
-Редагувати
-</button>
-
-<button
-onClick={()=>removeStudent(s.id)}
-className='bg-red-500 text-white px-3 py-2 rounded-xl'
->
-Видалити
-</button>
-
-</>
-
-)}
-
-</td>
-
-</tr>
-
-))}
-
-</tbody>
-</table>
-
-</div>
-
-)
-
+const tdStyle = {
+  padding: 15,
+  borderBottom: '1px solid #eee'
 }

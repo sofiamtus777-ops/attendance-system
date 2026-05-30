@@ -1,70 +1,80 @@
 'use client'
-import {useState} from 'react'
 
-export default function LoginForm({onLogin}){
+import { useState } from 'react'
 
-const [login,setLogin]=useState('')
-const [password,setPassword]=useState('')
-const [error,setError]=useState('')
+export default function LoginForm({ onLogin }: any) {
 
-async function handleLogin(){
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
-  const res = await fetch('/api/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ login, password })
-  })
+  async function login() {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    })
 
-  if (!res.ok) {
-    setError('Невірний логін або пароль')
-    return
+    const data = await res.json()
+
+    if (data.success) {
+      onLogin(data.user)
+    } else {
+      alert('Невірний email або пароль')
+    }
   }
 
-  const data = await res.json()
-  onLogin(data)
-}
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      background: '#dce8f7'
+    }}>
+      
+      <div style={{
+        background: 'white',
+        padding: 40,
+        borderRadius: 20,
+        width: 350
+      }}>
 
-return(
-<div className='min-h-screen flex items-center justify-center bg-sky-100'>
+        <h1>Login</h1>
 
-  <div className='bg-white p-10 rounded-3xl shadow-2xl w-80'>
+        <input
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ width: '100%', padding: 12, marginBottom: 10 }}
+        />
 
-    <h2 className='text-3xl mb-5 text-center font-bold'>
-      Авторизація
-    </h2>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ width: '100%', padding: 12, marginBottom: 20 }}
+        />
 
-    <input
-      placeholder='Логін'
-      value={login}
-      onChange={e=>setLogin(e.target.value)}
-      className='border p-3 mb-3 w-full rounded-xl'
-    />
+        <button
+          onClick={login}
+          style={{
+            width: '100%',
+            padding: 12,
+            background: '#d4a373',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          Увійти
+        </button>
 
-    <input
-      type='password'
-      placeholder='Пароль'
-      value={password}
-      onChange={e=>setPassword(e.target.value)}
-      className='border p-3 mb-3 w-full rounded-xl'
-    />
-
-    {error && (
-      <p className='text-red-500 mb-3'>
-        {error}
-      </p>
-    )}
-
-    <button
-      onClick={handleLogin}
-      className='bg-blue-600 text-white w-full p-3 rounded-xl'
-    >
-      Увійти
-    </button>
-
-  </div>
-
-</div>
-)
+      </div>
+    </div>
+  )
 }
