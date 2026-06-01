@@ -1,31 +1,38 @@
-export default function StatisticsPanel({students}){
+type Student = {
+  id: number
+  name: string
+  absences: number
+}
 
-const absent=
-students.filter(
-s=>s.absences>0
-).length
+type StatisticsPanelProps = {
+  students: Student[]
+}
 
-const present=
-students.length-absent
+export default function StatisticsPanel({
+  students
+}: StatisticsPanelProps) {
 
-const percent=Math.round(
-(present/students.length)*100
-)
+  const absent = students.filter(
+    (s) => s.absences > 0
+  ).length
 
-return(
+  const present = students.length - absent
 
-<div className='bg-white p-8 rounded-3xl mb-8'>
+  const percent = students.length > 0
+    ? Math.round((present / students.length) * 100)
+    : 0
 
-<p>Студентів: {students.length}</p>
-<p>Присутні: {present}</p>
-<p>Відсутні: {absent}</p>
-<p>Відвідуваність: {percent}%</p>
+  return (
+    <div className="bg-white p-8 rounded-3xl mb-8">
 
-<p>Вересень: 5 пропусків</p>
-<p>Жовтень: 2 пропуски</p>
+      <p>Студентів: {students.length}</p>
+      <p>Присутні: {present}</p>
+      <p>Відсутні: {absent}</p>
+      <p>Відвідуваність: {percent}%</p>
 
-</div>
+      <p>Вересень: 5 пропусків</p>
+      <p>Жовтень: 2 пропуски</p>
 
-)
-
+    </div>
+  )
 }

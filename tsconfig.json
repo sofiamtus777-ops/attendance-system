@@ -17,7 +17,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    // 🔥 ОЦЕ ДОДАТИ ОБОВ’ЯЗКОВО
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -34,10 +33,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts",
-    "next.config.js"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
