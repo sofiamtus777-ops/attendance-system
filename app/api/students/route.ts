@@ -5,9 +5,10 @@ export async function GET() {
 
   try {
 
-    const [rows] = await db.query(
-      'SELECT * FROM students'
-    )
+    const [rows] =
+      await db.query(
+        'SELECT * FROM students'
+      )
 
     return NextResponse.json(rows)
 
@@ -23,16 +24,27 @@ export async function POST(req: Request) {
 
   try {
 
-    const { name, group_name } =
-      await req.json()
+    const {
+      name,
+      group_name,
+      user_id
+    } = await req.json()
 
     await db.query(
       `
       INSERT INTO students
-      (name, group_name)
-      VALUES (?, ?)
+      (
+        name,
+        group_name,
+        user_id
+      )
+      VALUES (?, ?, ?)
       `,
-      [name, group_name]
+      [
+        name,
+        group_name,
+        user_id
+      ]
     )
 
     return NextResponse.json({
@@ -62,8 +74,9 @@ export async function PUT(req: Request) {
     await db.query(
       `
       UPDATE students
-      SET name = ?,
-          group_name = ?
+      SET
+        name = ?,
+        group_name = ?
       WHERE id = ?
       `,
       [

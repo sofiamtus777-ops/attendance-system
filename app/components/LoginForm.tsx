@@ -8,6 +8,7 @@ export default function LoginForm({ onLogin }: any) {
   const [password, setPassword] = useState('')
 
   async function login() {
+
     const res = await fetch('/api/login', {
       method: 'POST',
       headers: {
@@ -22,27 +23,39 @@ export default function LoginForm({ onLogin }: any) {
     const data = await res.json()
 
     if (data.success) {
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify(data.user)
+      )
+
       onLogin(data.user)
+
     } else {
+
       alert('Невірний email або пароль')
     }
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      background: '#dce8f7'
-    }}>
-      
-      <div style={{
-        background: 'white',
-        padding: 40,
-        borderRadius: 20,
-        width: 350
-      }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: '#dce8f7'
+      }}
+    >
+
+      <div
+        style={{
+          background: 'white',
+          padding: 40,
+          borderRadius: 20,
+          width: 350
+        }}
+      >
 
         <h1>Login</h1>
 
@@ -50,7 +63,11 @@ export default function LoginForm({ onLogin }: any) {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: 12, marginBottom: 10 }}
+          style={{
+            width: '100%',
+            padding: 12,
+            marginBottom: 10
+          }}
         />
 
         <input
@@ -58,7 +75,11 @@ export default function LoginForm({ onLogin }: any) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', padding: 12, marginBottom: 20 }}
+          style={{
+            width: '100%',
+            padding: 12,
+            marginBottom: 20
+          }}
         />
 
         <button
@@ -75,6 +96,7 @@ export default function LoginForm({ onLogin }: any) {
         </button>
 
       </div>
+
     </div>
   )
 }

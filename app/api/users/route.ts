@@ -23,10 +23,12 @@ export async function POST(req: Request) {
       subject
     } = body
 
-    await db.execute(
-      `INSERT INTO users 
+    const [result]: any = await db.execute(
+      `
+      INSERT INTO users
       (username, email, password, role, subject)
-      VALUES (?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?)
+      `,
       [
         username,
         email,
@@ -37,7 +39,8 @@ export async function POST(req: Request) {
     )
 
     return NextResponse.json({
-      success: true
+      success: true,
+      userId: result.insertId
     })
 
   } catch (error) {

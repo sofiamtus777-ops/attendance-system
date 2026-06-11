@@ -5,36 +5,27 @@ export async function POST(req: Request) {
 
   try {
 
-    const { email, password } = await req.json()
+    const { userId } = await req.json()
 
-    const [users]: any = await db.query(
+    const [rows]: any = await db.query(
       `
       SELECT *
-      FROM users
-      WHERE email = ?
-      AND password = ?
+      FROM students
+      WHERE user_id = ?
       `,
-      [email, password]
+      [userId]
     )
 
-    if (!users.length) {
+    if (!rows.length) {
 
       return NextResponse.json({
         success: false
       })
     }
 
-    const user = users[0]
-
     return NextResponse.json({
       success: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        subject: user.subject
-      }
+      student: rows[0]
     })
 
   } catch (error) {

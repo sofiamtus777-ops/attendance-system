@@ -7,31 +7,42 @@ export async function POST(req: Request) {
 
     const body = await req.json()
 
-    const {
-      student_id,
-      date,
-      status,
-      teacher_id
-    } = body
+   const {
+  student_id,
+  date,
+  status,
+  teacher_id,
+  subject
+} = body
 
     await db.query(
 
-      `
-      INSERT INTO attendance
-      (student_id, date, status, teacher_id)
+  `
+  INSERT INTO attendance
+  (
+    student_id,
+    date,
+    status,
+    teacher_id,
+    subject
+  )
 
-      VALUES (?, ?, ?, ?)
+  VALUES (?, ?, ?, ?, ?)
 
-      ON DUPLICATE KEY UPDATE
-      status = VALUES(status)
-      `,
-      [
-        student_id,
-        date,
-        status,
-        teacher_id
-      ]
-    )
+  ON DUPLICATE KEY UPDATE
+
+  status = VALUES(status),
+  subject = VALUES(subject)
+
+  `,
+  [
+    student_id,
+    date,
+    status,
+    teacher_id,
+    subject
+  ]
+)
 
     return NextResponse.json({
       success: true

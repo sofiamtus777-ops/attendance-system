@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from 'react'
 
-export default function AddStudentForm({
-  onAdded
-}: any) {
+export default function AddStudentForm({ onAdded }: any) {
 
   const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
+  const [group, setGroup] = useState('')
   const [groups, setGroups] = useState<any[]>([])
-
-  const [groupName, setGroupName] = useState('')
 
   useEffect(() => {
     loadGroups()
@@ -20,17 +19,16 @@ export default function AddStudentForm({
 
     try {
 
-      const res = await fetch('/api/groups')
+      const res =
+        await fetch('/api/groups')
 
-      const data = await res.json()
+      const data =
+        await res.json()
 
-      if (Array.isArray(data)) {
+      setGroups(data)
 
-        setGroups(data)
-
-        if (data.length > 0) {
-          setGroupName(data[0].name)
-        }
+      if (data.length > 0) {
+        setGroup(data[0].name)
       }
 
     } catch (error) {
@@ -39,183 +37,173 @@ export default function AddStudentForm({
     }
   }
 
-  async function addStudent() {
+  async function addStudent(e: any) {
 
-    if (!name || !groupName) {
-      alert('Заповни всі поля')
+    e.preventDefault()
+
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !group
+    ) {
+      alert('Заповніть всі поля')
       return
     }
 
     try {
 
-      const res = await fetch('/api/students', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name,
-          group_name: groupName
+      // Створюємо користувача
+
+      const userRes =
+        await fetch('/api/users', {
+
+          method: 'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body: JSON.stringify({
+
+            username: name,
+            email,
+            password,
+            role: 'student',
+            subject: null
+          })
         })
-      })
 
-      const data = await res.json()
+      const userData =
+        await userRes.json()
 
-      console.log(data)
+      if (!userData.success) {
 
-      if (data.success) {
+        alert(
+          'Помилка створення користувача'
+        )
 
-        alert('Студента додано')
+        return
+      }
 
-        setName('')
+      // Створюємо студента
 
+      const studentRes =
+        await fetch('/api/students', {
+
+          method: 'POST',
+
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+
+          body: JSON.stringify({
+
+            name,
+            group_name: group,
+            user_id: userData.userId
+          })
+        })
+
+      const studentData =
+        await studentRes.json()
+
+      if (!studentData.success) {
+
+        alert(
+          'Помилка створення студента'
+        )
+
+        return
+      }
+
+      setName('')
+      setEmail('')
+      setPassword('')
+
+      if (groups.length > 0) {
+        setGroup(groups[0].name)
+      }
+
+      if (onAdded) {
         onAdded()
-
-      } else {
-
-        alert('Помилка додавання')
       }
+
+      alert('Студента успішно створено')
 
     } catch (error) {
 
       console.log(error)
 
-      alert('Помилка сервера')
-    }
-  }
-
-  async function addGroup() {
-
-    const newGroup = prompt(
-      'Назва нової групи'
-    )
-
-    if (!newGroup) return
-
-    try {
-
-      const res = await fetch('/api/groups', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: newGroup
-        })
-      })
-
-      const data = await res.json()
-
-      if (data.success) {
-
-        alert('Групу додано')
-
-        loadGroups()
-
-      } else {
-
-        alert('Помилка додавання групи')
-      }
-
-    } catch (error) {
-
-      console.log(error)
-
-      alert('Помилка сервера')
+      alert('Сталася помилка')
     }
   }
 
   return (
 
-    <div style={{
-      background: 'white',
-      padding: 25,
-      borderRadius: 20,
-      marginBottom: 30
-    }}>
-
-      <h2>
-        Додати студента
-      </h2>
-
-      <div style={{
+    <form
+      onSubmit={addStudent}
+      style={{
         display: 'flex',
-        gap: 15,
-        marginTop: 20,
+        gap: 10,
+        marginBottom: 20,
         flexWrap: 'wrap'
-      }}>
+      }}
+    >
 
-        <input
-          placeholder="Імʼя студента"
-          value={name}
-          onChange={(e) =>
-            setName(e.target.value)
-          }
-          style={{
-            padding: 15,
-            borderRadius: 12,
-            border: '1px solid #ccc',
-            minWidth: 250
-          }}
-        />
+      <input
+        type="text"
+        placeholder="Ім'я студента"
+        value={name}
+        onChange={(e) =>
+          setName(e.target.value)
+        }
+      />
 
-        <select
-          value={groupName}
-          onChange={(e) =>
-            setGroupName(e.target.value)
-          }
-          style={{
-            padding: 15,
-            borderRadius: 12,
-            border: '1px solid #ccc',
-            minWidth: 200
-          }}
-        >
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) =>
+          setEmail(e.target.value)
+        }
+      />
 
-          {groups.map((g: any) => (
+      <input
+        type="password"
+        placeholder="Пароль"
+        value={password}
+        onChange={(e) =>
+          setPassword(e.target.value)
+        }
+      />
 
-            <option
-              key={g.id}
-              value={g.name}
-            >
-              {g.name}
-            </option>
+      <select
+        value={group}
+        onChange={(e) =>
+          setGroup(e.target.value)
+        }
+      >
 
-          ))}
+        {groups.map((g: any) => (
 
-        </select>
+          <option
+            key={g.id}
+            value={g.name}
+          >
+            {g.name}
+          </option>
 
-        <button
-          onClick={addStudent}
-          style={{
-            padding: '15px 25px',
-            borderRadius: 12,
-            border: 'none',
-            background: '#22c55e',
-            color: 'white',
-            fontWeight: 'bold',
-            cursor: 'pointer'
-          }}
-        >
-          ➕ Додати студента
-        </button>
+        ))}
 
-        <button
-          onClick={addGroup}
-          style={{
-            padding: '15px 25px',
-            borderRadius: 12,
-            border: 'none',
-            background: '#e9d46a',
-            fontWeight: 'bold',
-            cursor: 'pointer'
-          }}
-        >
-          ➕ Нова група
-        </button>
+      </select>
 
-      </div>
+      <button type="submit">
+        Додати студента
+      </button>
 
-    </div>
+    </form>
   )
 }

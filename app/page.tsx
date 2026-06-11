@@ -257,13 +257,10 @@ const [teacherPassword, setTeacherPassword] =
     }
   }
 
-  function dayKey() {
+ function dayKey() {
 
-    const subject =
-      user?.subject || 'general'
-
-    return `${subject}_${month}-${day}`
-  }
+  return `${month}-${day}`
+}
 
   async function mark(
     id: number,
@@ -806,6 +803,13 @@ async function editStudent(
       />
     )
   }
+
+  if (user?.role === 'student') {
+
+  return (
+    <StudentDashboard user={user} />
+  )
+}
 
   return (
 
@@ -1464,6 +1468,301 @@ async function editStudent(
   )
 }
 
+function StudentDashboard({ user }: any) {
+
+  const [student, setStudent] =
+    useState<any>(null)
+
+  const [attendance, setAttendance] =
+    useState<any[]>([])
+
+  useEffect(() => {
+
+    loadStudent()
+    loadAttendance()
+
+  }, [])
+
+  async function loadStudent() {
+
+    const res =
+      await fetch(
+        '/api/student-profile',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+          body: JSON.stringify({
+            userId: user.id
+          })
+        }
+      )
+
+    const data =
+      await res.json()
+
+    if (data.success) {
+
+      setStudent(data.student)
+    }
+  }
+
+  async function loadAttendance() {
+
+    const res =
+      await fetch(
+        '/api/student-attendance',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type':
+              'application/json'
+          },
+          body: JSON.stringify({
+            userId: user.id
+          })
+        }
+      )
+
+    const data =
+      await res.json()
+
+    if (Array.isArray(data)) {
+
+      setAttendance(data)
+
+    } else if (data.success) {
+
+      setAttendance(
+        data.attendance
+      )
+    }
+  }
+
+  const totalLessons =
+    attendance.length
+
+  const presentLessons =
+    attendance.filter(
+      (a: any) =>
+        a.status === 'present'
+    ).length
+
+  const absences =
+    attendance.filter(
+      (a: any) =>
+        a.status === 'absent'
+    ).length
+
+  const attendancePercent =
+    totalLessons > 0
+      ? (
+          (presentLessons /
+            totalLessons) *
+          100
+        ).toFixed(1)
+      : '0'
+
+  return (
+
+   <div
+  style={{
+    padding: window.innerWidth < 500 ? 15 : 30,
+    background: '#dce8f7',
+    minHeight: '100vh'
+  }}
+    >
+
+      <button
+        onClick={() => {
+
+          localStorage.removeItem(
+            'user'
+          )
+
+          window.location.reload()
+        }}
+        style={{
+  width: window.innerWidth < 500
+    ? '100%'
+    : 'auto',
+  padding: '12px',
+  border: 'none',
+  borderRadius: 10,
+  background: '#ff8787',
+  cursor: 'pointer',
+  marginBottom: 20
+}}
+      >
+        Вийти
+      </button>
+
+      <h1
+  style={{
+    fontSize:
+      window.innerWidth < 500
+        ? '24px'
+        : '36px'
+  }}
+>
+  👨‍🎓 Особистий кабінет студента
+</h1>
+
+      {student && (
+
+        <div
+          style={{
+            background: 'white',
+            padding: 20,
+            borderRadius: 20,
+            marginTop: 20
+          }}
+        >
+
+          <h2>
+            {student.name}
+          </h2>
+
+          <p>
+            Група:
+            {' '}
+            {student.group_name}
+          </p>
+
+          <p>
+            ID:
+            {' '}
+            {student.id}
+          </p>
+
+        </div>
+
+      )}
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(4,1fr)',
+          gap: 20,
+          marginBottom: 30
+        }}
+      >
+
+        <Card
+          title="Всього пар"
+          value={totalLessons}
+        />
+
+        <Card
+          title="Присутній"
+          value={presentLessons}
+        />
+
+        <Card
+          title="Відсутній"
+          value={absences}
+        />
+
+        <Card
+          title="Відвідуваність"
+          value={`${attendancePercent}%`}
+        />
+
+      </div>
+
+      <div
+        style={{
+          background: 'white',
+          padding: 20,
+          borderRadius: 20,
+          marginTop: 20
+        }}
+      >
+
+        <h2>
+          📅 Відвідуваність
+        </h2>
+
+     <div
+  style={{
+    overflowX: 'auto'
+  }}
+>
+
+  <table
+    style={{
+      width: '100%',
+      borderCollapse: 'collapse',
+      minWidth: '500px'
+    }}
+  >
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Предмет
+              </th>
+
+              <th>
+                Дата
+              </th>
+
+              <th>
+                Статус
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {attendance.map(
+              (a: any) => (
+
+                <tr
+                  key={a.id}
+                >
+
+                  <td>
+                    {a.subject ||
+                      'Не вказано'}
+                  </td>
+
+                  <td>
+                    {a.date}
+                  </td>
+
+                  <td>
+
+                    {a.status ===
+                    'present'
+                      ? '✅ Присутній'
+                      : '❌ Відсутній'}
+
+                  </td>
+
+                </tr>
+
+              )
+            )}
+
+          </tbody>
+
+        </table>
+        </div>
+
+      </div>
+
+    </div>
+  )
+}
+
 function Card({
   title,
   value
@@ -1473,16 +1772,35 @@ function Card({
 
     <div
       style={{
-        background: 'white',
+        background: '#ffffff',
         borderRadius: 20,
         padding: 20,
-        textAlign: 'center'
+        textAlign: 'center',
+        boxShadow:
+          '0 4px 15px rgba(0,0,0,0.1)',
+        border:
+          '1px solid #e5e7eb'
       }}
     >
 
-      <h3>{title}</h3>
+      <h3
+        style={{
+          color: '#666',
+          marginBottom: 10
+        }}
+      >
+        {title}
+      </h3>
 
-      <h2>{value}</h2>
+      <h2
+        style={{
+          color: '#2563eb',
+          fontSize: '32px',
+          margin: 0
+        }}
+      >
+        {value}
+      </h2>
 
     </div>
   )
