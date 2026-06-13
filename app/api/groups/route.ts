@@ -5,19 +5,15 @@ export async function GET() {
   try {
 
     const [rows] = await db.query(
-      'SELECT * FROM `groups`'
+      'SHOW TABLES'
     )
-
-    console.log('GROUPS:', rows)
 
     return NextResponse.json(rows)
 
-  } catch (error) {
-
-    console.error('GROUPS ERROR:', error)
+  } catch (error: any) {
 
     return NextResponse.json({
-      error: String(error)
+      error: error.message
     })
   }
 }
