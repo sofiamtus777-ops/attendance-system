@@ -1,16 +1,8 @@
 import { NextResponse } from 'next/server'
-import mysql from 'mysql2/promise'
+import db from '@/lib/db'
 
 export async function POST(req: Request) {
   try {
-    const db = await mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      password: '',
-      database: 'attendance',
-      port: 3307
-    })
-
     const body = await req.json()
 
     const {
@@ -35,8 +27,6 @@ export async function POST(req: Request) {
         subject
       ]
     )
-
-    await db.end()
 
     return NextResponse.json({
       success: true,
