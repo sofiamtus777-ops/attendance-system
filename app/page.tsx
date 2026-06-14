@@ -53,6 +53,9 @@ const [teacherPassword, setTeacherPassword] =
     setTeacherSubject] =
     useState('')
 
+    const [newGroup, setNewGroup] =
+  useState('')
+
   const [activeGroup, setActiveGroup] =
     useState('')
 
@@ -384,6 +387,34 @@ const [teacherPassword, setTeacherPassword] =
   }
 }
 
+async function addGroup() {
+
+  if (!newGroup) return
+
+  try {
+
+    await fetch('/api/groups', {
+
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json'
+      },
+
+      body: JSON.stringify({
+        name: newGroup
+      })
+    })
+
+    setNewGroup('')
+
+    loadGroups()
+
+  } catch (error) {
+
+    console.log(error)
+  }
+}
     async function deleteStudent(
     id: number
   ) {
@@ -1111,6 +1142,56 @@ async function editStudent(
 
             ))}
 
+            <h2
+  style={{
+    marginTop: 30
+  }}
+>
+  👥 Групи
+</h2>
+
+<div
+  style={{
+    display: 'flex',
+    gap: 10,
+    marginBottom: 20
+  }}
+>
+
+  <input
+    placeholder="Назва групи"
+
+    value={newGroup}
+
+    onChange={(e) =>
+      setNewGroup(
+        e.target.value
+      )
+    }
+
+    style={{
+      padding: 10,
+      borderRadius: 10,
+      flex: 1
+    }}
+  />
+
+  <button
+    onClick={addGroup}
+
+    style={{
+      padding: '10px 20px',
+      border: 'none',
+      borderRadius: 10,
+      background: '#b1e8a8',
+      cursor: 'pointer'
+    }}
+  >
+    Додати групу
+  </button>
+
+</div>
+
           </div>
         </>
 
@@ -1485,130 +1566,103 @@ function StudentDashboard({ user }: any) {
 
   async function loadStudent() {
 
-    const res =
-      await fetch(
-        '/api/student-profile',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type':
-              'application/json'
-          },
-          body: JSON.stringify({
-            userId: user.id
-          })
-        }
-      )
+    try {
 
-    const data =
-      await res.json()
+      const res =
+        await fetch(
+          '/api/student-profile',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body: JSON.stringify({
+              userId: user.id
+            })
+          }
+        )
 
-    if (data.success) {
+      const data =
+        await res.json()
 
-      setStudent(data.student)
+      if (data.success) {
+
+        setStudent(data.student)
+      }
+
+    } catch (error) {
+
+      console.log(error)
     }
   }
 
   async function loadAttendance() {
 
-    const res =
-      await fetch(
-        '/api/student-attendance',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type':
-              'application/json'
-          },
-          body: JSON.stringify({
-            userId: user.id
-          })
-        }
-      )
+    try {
 
-    const data =
-      await res.json()
+      const res =
+        await fetch(
+          '/api/student-attendance',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json'
+            },
+            body: JSON.stringify({
+              userId: user.id
+            })
+          }
+        )
 
-    if (Array.isArray(data)) {
+      const data =
+        await res.json()
 
-      setAttendance(data)
+      if (data.success) {
 
-    } else if (data.success) {
+        setAttendance(data.data)
+      }
 
-      setAttendance(
-        data.attendance
-      )
+    } catch (error) {
+
+      console.log(error)
     }
   }
 
-  const totalLessons =
-    attendance.length
-
-  const presentLessons =
-    attendance.filter(
-      (a: any) =>
-        a.status === 'present'
-    ).length
-
-  const absences =
-    attendance.filter(
-      (a: any) =>
-        a.status === 'absent'
-    ).length
-
-  const attendancePercent =
-    totalLessons > 0
-      ? (
-          (presentLessons /
-            totalLessons) *
-          100
-        ).toFixed(1)
-      : '0'
-
   return (
 
-   <div
-  style={{
-    padding: window.innerWidth < 500 ? 15 : 30,
-    background: '#dce8f7',
-    minHeight: '100vh'
-  }}
+    <div
+      style={{
+        padding: 30,
+        background: '#dce8f7',
+        minHeight: '100vh'
+      }}
     >
+
+      <h1>
+        👨‍🎓 Кабінет студента
+      </h1>
 
       <button
         onClick={() => {
 
-          localStorage.removeItem(
-            'user'
-          )
+          localStorage.removeItem('user')
 
           window.location.reload()
         }}
+
         style={{
-  width: window.innerWidth < 500
-    ? '100%'
-    : 'auto',
-  padding: '12px',
-  border: 'none',
-  borderRadius: 10,
-  background: '#ff8787',
-  cursor: 'pointer',
-  marginBottom: 20
-}}
+          padding: '10px 20px',
+          border: 'none',
+          borderRadius: 10,
+          background: '#f2dc7d',
+          cursor: 'pointer',
+          marginBottom: 20
+        }}
       >
         Вийти
       </button>
-
-      <h1
-  style={{
-    fontSize:
-      window.innerWidth < 500
-        ? '24px'
-        : '36px'
-  }}
->
-  👨‍🎓 Особистий кабінет студента
-</h1>
 
       {student && (
 
@@ -1617,7 +1671,7 @@ function StudentDashboard({ user }: any) {
             background: 'white',
             padding: 20,
             borderRadius: 20,
-            marginTop: 20
+            marginBottom: 30
           }}
         >
 
@@ -1628,13 +1682,9 @@ function StudentDashboard({ user }: any) {
           <p>
             Група:
             {' '}
-            {student.group_name}
-          </p>
-
-          <p>
-            ID:
-            {' '}
-            {student.id}
+            <b>
+              {student.group_name}
+            </b>
           </p>
 
         </div>
@@ -1643,76 +1693,31 @@ function StudentDashboard({ user }: any) {
 
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns:
-            'repeat(4,1fr)',
-          gap: 20,
-          marginBottom: 30
-        }}
-      >
-
-        <Card
-          title="Всього пар"
-          value={totalLessons}
-        />
-
-        <Card
-          title="Присутній"
-          value={presentLessons}
-        />
-
-        <Card
-          title="Відсутній"
-          value={absences}
-        />
-
-        <Card
-          title="Відвідуваність"
-          value={`${attendancePercent}%`}
-        />
-
-      </div>
-
-      <div
-        style={{
           background: 'white',
           padding: 20,
-          borderRadius: 20,
-          marginTop: 20
+          borderRadius: 20
         }}
       >
 
         <h2>
-          📅 Відвідуваність
+          📋 Моя відвідуваність
         </h2>
 
-     <div
-  style={{
-    overflowX: 'auto'
-  }}
->
-
-  <table
-    style={{
-      width: '100%',
-      borderCollapse: 'collapse',
-      minWidth: '500px'
-    }}
-  >
+        <table
+          style={{
+            width: '100%'
+          }}
+        >
 
           <thead>
 
             <tr>
 
-              <th>
-                Предмет
-              </th>
-
-              <th>
+              <th style={thStyle}>
                 Дата
               </th>
 
-              <th>
+              <th style={thStyle}>
                 Статус
               </th>
 
@@ -1722,40 +1727,27 @@ function StudentDashboard({ user }: any) {
 
           <tbody>
 
-            {attendance.map(
-              (a: any) => (
+            {attendance.map((a: any) => (
 
-                <tr
-                  key={a.id}
-                >
+              <tr key={a.id}>
 
-                  <td>
-                    {a.subject ||
-                      'Не вказано'}
-                  </td>
+                <td style={tdStyle}>
+                  {a.date}
+                </td>
 
-                  <td>
-                    {a.date}
-                  </td>
+                <td style={tdStyle}>
+                  {a.status === 'absent'
+                    ? '❌ Відсутній'
+                    : '✅ Присутній'}
+                </td>
 
-                  <td>
+              </tr>
 
-                    {a.status ===
-                    'present'
-                      ? '✅ Присутній'
-                      : '❌ Відсутній'}
-
-                  </td>
-
-                </tr>
-
-              )
-            )}
+            ))}
 
           </tbody>
 
         </table>
-        </div>
 
       </div>
 
@@ -1763,48 +1755,7 @@ function StudentDashboard({ user }: any) {
   )
 }
 
-function Card({
-  title,
-  value
-}: any) {
-
-  return (
-
-    <div
-      style={{
-        background: '#ffffff',
-        borderRadius: 20,
-        padding: 20,
-        textAlign: 'center',
-        boxShadow:
-          '0 4px 15px rgba(0,0,0,0.1)',
-        border:
-          '1px solid #e5e7eb'
-      }}
-    >
-
-      <h3
-        style={{
-          color: '#666',
-          marginBottom: 10
-        }}
-      >
-        {title}
-      </h3>
-
-      <h2
-        style={{
-          color: '#2563eb',
-          fontSize: '32px',
-          margin: 0
-        }}
-      >
-        {value}
-      </h2>
-
-    </div>
-  )
-}
+    
 
 const thStyle: any = {
   padding: 12,
@@ -1831,4 +1782,34 @@ const circleRed: any = {
   border: 'none',
   background: '#f2a4a4',
   cursor: 'pointer'
+}
+
+function Card({
+  title,
+  value
+}: {
+  title: string
+  value: any
+}) {
+  return (
+    <div
+      style={{
+        background: 'white',
+        padding: 20,
+        borderRadius: 20,
+        textAlign: 'center'
+      }}
+    >
+      <h3>{title}</h3>
+
+      <div
+        style={{
+          fontSize: 28,
+          fontWeight: 'bold'
+        }}
+      >
+        {value}
+      </div>
+    </div>
+  )
 }
