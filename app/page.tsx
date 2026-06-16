@@ -1617,17 +1617,25 @@ function StudentDashboard({ user }: any) {
         )
 
       const data =
-        await res.json()
+  await res.json()
 
-      if (data.success) {
+if (
+  data.success &&
+  Array.isArray(data.data)
+) {
 
-        setAttendance(data.data)
-      }
+  setAttendance(data.data)
 
-    } catch (error) {
+} else {
 
-      console.log(error)
-    }
+  setAttendance([])
+}
+
+} catch (error) {
+
+  console.log(error)
+  setAttendance([])
+}
   }
 
   return (
@@ -1727,7 +1735,7 @@ function StudentDashboard({ user }: any) {
 
           <tbody>
 
-            {attendance.map((a: any) => (
+            {attendance?.map((a: any) => (
 
               <tr key={a.id}>
 
