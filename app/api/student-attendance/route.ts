@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 
 export async function POST(req: Request) {
-
   try {
-
     const { userId } = await req.json()
 
     const [student]: any = await db.query(
@@ -17,10 +15,9 @@ export async function POST(req: Request) {
     )
 
     if (!student.length) {
-
       return NextResponse.json({
         success: false,
-        attendance: []
+        data: []
       })
     }
 
@@ -38,16 +35,15 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      attendance
+      data: attendance
     })
 
   } catch (error) {
-
     console.log(error)
 
     return NextResponse.json({
       success: false,
-      attendance: []
+      data: []
     })
   }
 }
