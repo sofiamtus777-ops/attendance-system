@@ -258,7 +258,7 @@ const [teacherPassword, setTeacherPassword] =
 
       if (!data.success) {
 
-        setAttendance({})
+        setAttendance([])
         return
       }
 
