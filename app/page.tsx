@@ -443,26 +443,6 @@ async function addGroup() {
     console.log(error)
   }
 }
-    async function deleteStudent(
-    id: number
-  ) {
-
-    try {
-
-      await fetch(
-        `/api/students?id=${id}`,
-        {
-          method: 'DELETE'
-        }
-      )
-
-      loadStudents()
-
-    } catch (error) {
-
-      console.log(error)
-    }
-  }
 
   async function editStudent(
     student: any
@@ -575,41 +555,78 @@ async function addGroup() {
     }
   }
 
-  async function deleteTeacher(
-    id: number
-  ) {
+async function editTeacher(
+  teacher: any
+) {
 
-    try {
+  const newName =
+    prompt(
+      'Нове імʼя викладача',
+      teacher.name
+    )
 
-      await fetch(
-        `/api/teachers?id=${id}`,
-        {
-          method: 'DELETE'
-        }
-      )
+  if (!newName) return
 
-      loadTeachers()
+  const newSubject =
+    prompt(
+      'Новий предмет',
+      teacher.subject
+    )
 
-    } catch (error) {
+  if (!newSubject) return
 
-      console.log(error)
-    }
+  try {
+
+    await fetch(
+      '/api/teachers',
+      {
+        method: 'PUT',
+
+        headers: {
+          'Content-Type':
+            'application/json'
+        },
+
+        body: JSON.stringify({
+          id: teacher.id,
+          name: newName,
+          subject: newSubject
+        })
+      }
+    )
+
+    loadTeachers()
+
+  } catch (error) {
+
+    console.log(error)
   }
+}
 
-  async function editTeacher(
-    teacher: any
-  ) {
-
-    async function deleteStudent(
+async function deleteTeacher(
   id: number
 ) {
 
-  const confirmDelete =
-    confirm(
-      'Видалити студента?'
+  try {
+
+    await fetch(
+      `/api/teachers?id=${id}`,
+      {
+        method: 'DELETE'
+      }
     )
 
-  if (!confirmDelete) return
+    loadTeachers()
+
+  } catch (error) {
+
+    console.log(error)
+  }
+}
+
+async function deleteStudent(
+  id: number
+) {
 
   try {
 
@@ -627,104 +644,6 @@ async function addGroup() {
     console.log(error)
   }
 }
-
-async function editStudent(
-  student: any
-) {
-
-  const newName =
-    prompt(
-      'Нове імʼя студента',
-      student.name
-    )
-
-  if (!newName) return
-
-  const newGroup =
-    prompt(
-      'Нова група',
-      student.group_name
-    )
-
-  if (!newGroup) return
-
-  try {
-
-    await fetch(
-      '/api/students',
-      {
-
-        method: 'PUT',
-
-        headers: {
-          'Content-Type':
-            'application/json'
-        },
-
-        body: JSON.stringify({
-
-          id: student.id,
-
-          name: newName,
-
-          group_name: newGroup
-        })
-      }
-    )
-
-    loadStudents()
-    loadGroups()
-
-  } catch (error) {
-
-    console.log(error)
-  }
-} 
-
-    const newName =
-      prompt(
-        'Нове імʼя',
-        teacher.name
-      )
-
-    if (!newName) return
-
-    const newSubject =
-      prompt(
-        'Новий предмет',
-        teacher.subject
-      )
-
-    if (!newSubject) return
-
-    try {
-
-      await fetch('/api/teachers', {
-
-        method: 'PUT',
-
-        headers: {
-          'Content-Type':
-            'application/json'
-        },
-
-        body: JSON.stringify({
-
-          id: teacher.id,
-
-          name: newName,
-
-          subject: newSubject
-        })
-      })
-
-      loadTeachers()
-
-    } catch (error) {
-
-      console.log(error)
-    }
-  }
 
   function getStatus(id: number) {
 
