@@ -70,19 +70,19 @@ export async function PUT(
     } = await req.json()
 
     await db.query(
-      `
-      UPDATE teachers
-      SET
-      name = ?,
-      subject = ?
-      WHERE id = ?
-      `,
-      [
-        name,
-        subject,
-        id
-      ]
-    )
+  `
+  UPDATE users
+  SET
+  username = ?,
+  subject = ?
+  WHERE id = ?
+  `,
+  [
+    name,
+    subject,
+    id
+  ]
+)
 
     return NextResponse.json({
       success: true
@@ -110,13 +110,13 @@ export async function DELETE(
     const id =
       searchParams.get('id')
 
-    await db.query(
-      `
-      DELETE FROM teachers
-      WHERE id = ?
-      `,
-      [id]
-    )
+   await db.query(
+  `
+  DELETE FROM users
+  WHERE id = ?
+  `,
+  [id]
+)
 
     return NextResponse.json({
       success: true
