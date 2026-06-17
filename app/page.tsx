@@ -748,25 +748,21 @@ async function editStudent(
     return total
   }
 
-  const filtered = students
-    .filter((s: any) => {
+  const filtered = Array.isArray(students)
+  ? students.filter((s: any) => {
 
       const matchSearch =
         s.name
           ?.toLowerCase()
-          .includes(
-            search.toLowerCase()
-          )
+          .includes(search.toLowerCase())
 
       const matchGroup =
         activeGroup === '' ||
         s.group_name === activeGroup
 
-      return (
-        matchSearch &&
-        matchGroup
-      )
+      return matchSearch && matchGroup
     })
+  : []
 
   const todayAbsences =
 
@@ -1661,16 +1657,24 @@ if (
 }
   }
 
-  const totalClasses = attendance.length
+ const allStatuses = Object.values(attendance)
+  .flatMap((day: any) =>
+    Object.values(day)
+  )
+
+const totalClasses =
+  allStatuses.length
 
 const presentCount =
-  attendance.filter(
-    (a: any) => a.status === 'present'
+  allStatuses.filter(
+    (status) =>
+      status === 'present'
   ).length
 
 const absentCount =
-  attendance.filter(
-    (a: any) => a.status === 'absent'
+  allStatuses.filter(
+    (status) =>
+      status === 'absent'
   ).length
 
 const attendancePercent =
