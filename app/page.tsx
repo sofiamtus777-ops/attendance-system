@@ -231,7 +231,7 @@ const [teacherPassword, setTeacherPassword] =
     const data =
       await res.json()
 
-    console.log(data)
+   console.log('TEACHERS:', data)
 
     if (Array.isArray(data)) {
 
@@ -1046,6 +1046,8 @@ async function deleteStudent(
   </button>
 
 </div>
+
+<p>Кількість викладачів: {teachers.length}</p>
 
 {teachers.map((t: any) => (
 

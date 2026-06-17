@@ -5,10 +5,14 @@ export async function GET() {
 
   try {
 
-    const [rows] = await db.query(
-      'SELECT * FROM teachers'
-    )
-
+    const [rows] = await db.query(`
+  SELECT
+    id,
+    username AS name,
+    subject
+  FROM users
+  WHERE role = 'teacher'
+`)
     return NextResponse.json(rows)
 
   } catch (error) {
