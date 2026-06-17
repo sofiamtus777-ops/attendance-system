@@ -28,28 +28,33 @@ export default function Home() {
   const [attendance, setAttendance] =
     useState<any>({})
 
-   const totalClasses =
-  attendance.length
+  const allStatuses = Object.values(attendance)
+  .flatMap((day: any) =>
+    Object.values(day)
+  )
+
+const totalClasses =
+  allStatuses.length
 
 const presentCount =
-  attendance.filter(
-    (a: any) =>
-      a.status === 'present'
+  allStatuses.filter(
+    (status: any) =>
+      status === 'present'
   ).length
 
 const absentCount =
-  attendance.filter(
-    (a: any) =>
-      a.status === 'absent'
+  allStatuses.filter(
+    (status: any) =>
+      status === 'absent'
   ).length
 
 const attendancePercent =
   totalClasses > 0
     ? (
-        (presentCount / totalClasses)
-        * 100
+        (presentCount /
+          totalClasses) * 100
       ).toFixed(1)
-    : '0.0'
+    : '0'
 
   const [groups, setGroups] =
     useState<any[]>([])
