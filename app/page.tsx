@@ -28,6 +28,29 @@ export default function Home() {
   const [attendance, setAttendance] =
     useState<any>({})
 
+   const totalClasses =
+  attendance.length
+
+const presentCount =
+  attendance.filter(
+    (a: any) =>
+      a.status === 'present'
+  ).length
+
+const absentCount =
+  attendance.filter(
+    (a: any) =>
+      a.status === 'absent'
+  ).length
+
+const attendancePercent =
+  totalClasses > 0
+    ? (
+        (presentCount / totalClasses)
+        * 100
+      ).toFixed(1)
+    : '0.0'
+
   const [groups, setGroups] =
     useState<any[]>([])
 
@@ -1638,6 +1661,26 @@ if (
 }
   }
 
+  const totalClasses = attendance.length
+
+const presentCount =
+  attendance.filter(
+    (a: any) => a.status === 'present'
+  ).length
+
+const absentCount =
+  attendance.filter(
+    (a: any) => a.status === 'absent'
+  ).length
+
+const attendancePercent =
+  totalClasses > 0
+    ? (
+        (presentCount /
+          totalClasses) * 100
+      ).toFixed(1)
+    : '0'
+
   return (
 
     <div
@@ -1672,9 +1715,43 @@ if (
         Вийти
       </button>
 
-      {student && (
+     {student && (
 
-        <div
+  <>
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns:
+          'repeat(4,1fr)',
+        gap: 20,
+        marginBottom: 30
+      }}
+    >
+
+      <Card
+        title="Всього пар"
+        value={totalClasses}
+      />
+
+      <Card
+        title="Присутній"
+        value={presentCount}
+      />
+
+      <Card
+        title="Відсутній"
+        value={absentCount}
+      />
+
+      <Card
+        title="Відвідуваність"
+        value={`${attendancePercent}%`}
+      />
+
+    </div>
+
+    <div
           style={{
             background: 'white',
             padding: 20,
@@ -1695,9 +1772,11 @@ if (
             </b>
           </p>
 
-        </div>
+                </div>
 
+      </>
       )}
+
 
       <div
         style={{
